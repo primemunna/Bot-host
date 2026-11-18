@@ -14,8 +14,8 @@ from telebot import types
 # ==========================================
 # CONFIGURATION (এখানে আপনার তথ্য বসান)
 # ==========================================
-BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"  # BotFather থেকে পাওয়া টোকেন
-UPI_ID = "yourupi@oksbi"                    # আপনার UPI ID
+BOT_TOKEN = "9191360263:AAFXlOSI3THzbtV7qYP2X5PI_9Lk0r53vgI"  # BotFather থেকে পাওয়া টোকেন
+UPI_ID = "8016922924@ibl"                    # আপনার UPI ID
 ADMIN_PASSWORD = "743405"                   # অ্যাডমিন পাসওয়ার্ড
 DEVELOPER_USERNAME = "@ai_brain_box_2"      # ডেভেলপার ইউজারনেম
 DB_NAME = "bot_data.db"
