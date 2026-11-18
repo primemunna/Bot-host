@@ -14,7 +14,7 @@ from telebot import types
 # ==========================================
 # CONFIGURATION
 # ==========================================
-BOT_TOKEN = "8677868565:AAEm_q6UNYr_mqStJFyms1sHrBfwOSicjV8"  
+BOT_TOKEN = "9189127227:AAHlU7NodYF6yrW6jc93PM6hPDXmL68WjTo"  
 UPI_ID = "8016922924@ibl"                    
 ADMIN_PASSWORD = "743405"                   
 DEVELOPER_USERNAME = "@ai_brain_box_2"      
@@ -42,7 +42,7 @@ def ist_now():
     return datetime.now(ist).strftime("%d-%m-%Y %I:%M %p")
 
 # ==========================================
-# MULTI-LANGUAGE COMPLETE TRANSLATIONS
+# TRANSLATIONS / LANGUAGES
 # ==========================================
 LANGS = {
     "en": {
@@ -59,8 +59,6 @@ LANGS = {
         "lang_btn": "🌐 Change Language",
         "no_prod": "❌ No products available right now.",
         "wallet_title": "👛 <b>My Wallet</b>\n\n💵 <b>Rs. Balance:</b> ₹{rs:.2f}\n🪙 <b>Coin Balance:</b> {coin} 🪙",
-        "choose_lang": "🌐 <b>Select your language:</b>",
-        "lang_changed": "✅ Language successfully changed to <b>English</b>!",
     },
     "hi": {
         "welcome": "👋 स्वागत है <b>{name}</b>!\n\nकृपया नीचे दिए गए मेनू से एक विकल्प चुनें 👇",
@@ -76,8 +74,6 @@ LANGS = {
         "lang_btn": "🌐 भाषा बदलें",
         "no_prod": "❌ वर्तमान में कोई उत्पाद उपलब्ध नहीं है।",
         "wallet_title": "👛 <b>मेरा वॉलेट</b>\n\n💵 <b>Rs. बैलेंस:</b> ₹{rs:.2f}\n🪙 <b>कॉइन बैलेंस:</b> {coin} 🪙",
-        "choose_lang": "🌐 <b>अपनी भाषा चुनें:</b>",
-        "lang_changed": "✅ भाषा सफलतापूर्वक बदलकर <b>हिन्दी</b> कर दी गई है!",
     },
     "bn": {
         "welcome": "👋 স্বাগতম <b>{name}</b>!\n\nনিচের মেনু থেকে আপনার পছন্দের অপশন বেছে নিন 👇",
@@ -86,15 +82,13 @@ LANGS = {
         "raffle": "🎟 র‍্যাফেল স্ট্যাটাস",
         "pur_hist": "📜 পার্চেজ হিস্ট্রি",
         "raf_hist": "📋 র‍্যাফেল হিস্ট্রি",
-        "wallet": "👛 ওয়ালেট",
+        "wallet": "👛 ওয়ালেট",
         "dev": "👨‍💻 ডেভেলপার",
         "admin_login": "🔐 এডমিন লগইন",
         "support": "🆘 হেল্প সাপোর্ট",
         "lang_btn": "🌐 ভাষা পরিবর্তন",
         "no_prod": "❌ বর্তমানে কোনো প্রোডাক্ট নেই।",
         "wallet_title": "👛 <b>আমার ওয়ালেট</b>\n\n💵 <b>টাকা ব্যালেন্স:</b> ₹{rs:.2f}\n🪙 <b>কয়েন ব্যালেন্স:</b> {coin} 🪙",
-        "choose_lang": "🌐 <b>আপনার ভাষা নির্বাচন করুন:</b>",
-        "lang_changed": "✅ সফলভাবে ভাষা পরিবর্তন করে <b>বাংলা</b> করা হয়েছে!",
     }
 }
 
@@ -269,7 +263,8 @@ def register_or_update_user(tg_user, referrer_id=None):
                 f"🪙 <b>Reward Earned:</b> +1 Coin\n"
                 f"📊 <b>Old Coin Balance:</b> {ref_old_coin} 🪙\n"
                 f"➕ <b>Added:</b> +1 🪙\n"
-                f"💰 <b>Total Coin Balance:</b> <b>{ref_new_coin} 🪙</b>"
+                f"💰 <b>Total Coin Balance:</b> <b>{ref_new_coin} 🪙</b>\n\n"
+                f"<i>আপনার লিংক থেকে নতুন ইউজার জয়েন করায় কয়েন যোগ হয়েছে!</i>"
             )
         except Exception:
             pass
@@ -304,7 +299,7 @@ def clear_state(user_id):
 
 
 # ==========================================
-# KEYBOARDS (DYNAMIC LANGUAGE SUPPORTED)
+# KEYBOARDS
 # ==========================================
 def main_menu_keyboard(user_id):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -364,7 +359,7 @@ def handle_start(message):
             reply_markup=admin_menu_keyboard()
         )
     else:
-        welcome_text = get_txt(user_id, "welcome").format(name=name)
+        welcome_text = LANGS["en"]["welcome"].format(name=name)
         bot.send_message(
             message.chat.id,
             welcome_text,
@@ -386,7 +381,8 @@ def send_raffle_status(chat_id, user_id):
         f"👥 <b>Total Raffles / Joins:</b> <b>{user['total_raffles']}</b>\n"
         f"🪙 <b>Total Coins Balance:</b> <b>{user['coin_balance']} 🪙</b>\n"
         f"💰 <b>Earnings Per Referral:</b> +1 🪙\n\n"
-        f"🔗 <b>Your Exclusive Raffle Link:</b>\n<code>{raffle_link}</code>"
+        f"🔗 <b>Your Exclusive Raffle Link:</b>\n<code>{raffle_link}</code>\n\n"
+        f"<i>এই লিংকটি বন্ধুদের সাথে শেয়ার করুন! প্রতি সফল জয়েনে আপনার অ্যাকাউন্টে সরাসরি ১ কয়েন যোগ হয়ে যাবে।</i>"
     )
     kb = types.InlineKeyboardMarkup()
     kb.add(types.InlineKeyboardButton("📤 Share Link Now", url=f"https://t.me/share/url?url={raffle_link}&text=Join%20this%20amazing%20bot%20and%20get%20free%20rewards!"))
@@ -397,7 +393,7 @@ def send_wallet(chat_id, user_id):
     user = get_user(user_id)
     if not user:
         return
-    text = get_txt(user_id, "wallet_title").format(rs=user['rs_balance'], coin=user['coin_balance'])
+    text = LANGS.get(user["language"], LANGS["en"])["wallet_title"].format(rs=user['rs_balance'], coin=user['coin_balance'])
     kb = types.InlineKeyboardMarkup()
     kb.row(
         types.InlineKeyboardButton("➕ Add Rs.", callback_data="wallet_add_rs"),
@@ -447,7 +443,7 @@ def deliver_product_file(chat_id, prod_name, file_type, file_value, file_name, t
 
 
 # ==========================================
-# MAIN TEXT HANDLER (ALL LANGUAGES)
+# MAIN TEXT HANDLER
 # ==========================================
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
@@ -455,8 +451,7 @@ def handle_text(message):
     text = message.text.strip()
     register_or_update_user(message.from_user)
 
-    # Universal Language Button Check across all 3 languages
-    if text in [LANGS["en"]["lang_btn"], LANGS["hi"]["lang_btn"], LANGS["bn"]["lang_btn"]]:
+    if text in ["🌐 Change Language", "🌐 भाषा बदलें", "🌐 ভাষা পরিবর্তন"]:
         clear_state(user_id)
         kb = types.InlineKeyboardMarkup()
         kb.row(
@@ -464,10 +459,9 @@ def handle_text(message):
             types.InlineKeyboardButton("🇮🇳 हिन्दी", callback_data="lang_hi"),
             types.InlineKeyboardButton("🇧🇩 বাংলা", callback_data="lang_bn")
         )
-        bot.send_message(message.chat.id, get_txt(user_id, "choose_lang"), reply_markup=kb)
+        bot.send_message(message.chat.id, "🌐 <b>Select your language / अपनी भाषा चुनें / ভাষা নির্বাচন করুন:</b>", reply_markup=kb)
         return
 
-    # Check menu selections dynamically based on any active language
     is_free = text in [LANGS["en"]["free_prod"], LANGS["hi"]["free_prod"], LANGS["bn"]["free_prod"]]
     is_paid = text in [LANGS["en"]["paid_prod"], LANGS["hi"]["paid_prod"], LANGS["bn"]["paid_prod"]]
     is_raffle = text in [LANGS["en"]["raffle"], LANGS["hi"]["raffle"], LANGS["bn"]["raffle"]]
@@ -1047,9 +1041,10 @@ def handle_callbacks(call):
             conn.execute("UPDATE users SET language = ? WHERE user_id = ?", (lang_code, user_id))
             conn.commit()
         
+        lang_names = {"en": "English", "hi": "हिन्दी", "bn": "বাংলা"}
         bot.send_message(
             chat_id,
-            get_txt(user_id, "lang_changed"),
+            f"✅ Language successfully changed to <b>{lang_names.get(lang_code, 'English')}</b>!",
             reply_markup=main_menu_keyboard(user_id)
         )
         return
