@@ -14,7 +14,7 @@ from telebot import types
 # ==========================================
 # CONFIGURATION
 # ==========================================
-BOT_TOKEN = "9189127227:AAHlU7NodYF6yrW6jc93PM6hPDXmL68WjTo"  
+BOT_TOKEN = "8677868565:AAEm_q6UNYr_mqStJFyms1sHrBfwOSicjV8"  
 UPI_ID = "8016922924@ibl"                    
 ADMIN_PASSWORD = "743405"                   
 DEVELOPER_USERNAME = "@ai_brain_box_2"      
