@@ -12,12 +12,12 @@ import telebot
 from telebot import types
 
 # ==========================================
-# CONFIGURATION (এখানে আপনার তথ্য বসান)
+# CONFIGURATION
 # ==========================================
-BOT_TOKEN = "8677868565:AAEm_q6UNYr_mqStJFyms1sHrBfwOSicjV8"  # BotFather থেকে পাওয়া টোকেন
-UPI_ID = "8016922924@ibl"                    # আপনার UPI ID
-ADMIN_PASSWORD = "743405"                   # অ্যাডমিন পাসওয়ার্ড
-DEVELOPER_USERNAME = "@ai_brain_box_2"      # ডেভেলপার ইউজারনেম
+BOT_TOKEN = "9191360263:AAFXlOSI3THzbtV7qYP2X5PI_9Lk0r53vgI"  
+UPI_ID = "8016922924@ibl"                    
+ADMIN_PASSWORD = "743405"                   
+DEVELOPER_USERNAME = "@ai_brain_box_2"      
 DB_NAME = "bot_data.db"
 
 # ==========================================
@@ -34,19 +34,87 @@ try:
 except Exception:
     BOT_USERNAME = ""
 
-# ইউজার স্টেট ও সেশন ম্যানেজমেন্ট (মেমোরিতে)
-user_states = {}       # user_id -> {"state": str, "data": dict}
-qr_sessions = {}       # user_id -> {"amount": float, "expires_at": float, "chat_id": int, "msg_id": int, "active": bool}
-
+user_states = {}       
+qr_sessions = {}       
 
 def ist_now():
     ist = timezone(timedelta(hours=5, minutes=30))
     return datetime.now(ist).strftime("%d-%m-%Y %I:%M %p")
 
+# ==========================================
+# MULTI-LANGUAGE COMPLETE TRANSLATIONS
+# ==========================================
+LANGS = {
+    "en": {
+        "welcome": "👋 Welcome <b>{name}</b>!\n\nPlease choose an option from the menu below 👇",
+        "free_prod": "🆓 Free Products",
+        "paid_prod": "💎 Paid Products",
+        "raffle": "🎟 Raffle Status",
+        "pur_hist": "📜 Purchase History",
+        "raf_hist": "📋 Raffle History",
+        "wallet": "👛 Wallet",
+        "dev": "👨‍💻 Developer",
+        "admin_login": "🔐 Admin Login",
+        "support": "🆘 Help Support",
+        "lang_btn": "🌐 Change Language",
+        "no_prod": "❌ No products available right now.",
+        "wallet_title": "👛 <b>My Wallet</b>\n\n💵 <b>Rs. Balance:</b> ₹{rs:.2f}\n🪙 <b>Coin Balance:</b> {coin} 🪙",
+        "choose_lang": "🌐 <b>Select your language:</b>",
+        "lang_changed": "✅ Language successfully changed to <b>English</b>!",
+    },
+    "hi": {
+        "welcome": "👋 स्वागत है <b>{name}</b>!\n\nकृपया नीचे दिए गए मेनू से एक विकल्प चुनें 👇",
+        "free_prod": "🆓 मुफ्त उत्पाद",
+        "paid_prod": "💎 पेड उत्पाद",
+        "raffle": "🎟 रैफल स्थिति",
+        "pur_hist": "📜 खरीदारी का इतिहास",
+        "raf_hist": "📋 रैफल इतिहास",
+        "wallet": "👛 वॉलेट",
+        "dev": "👨‍💻 डेवलपर",
+        "admin_login": "🔐 एडमिन लॉगिन",
+        "support": "🆘 सहायता समर्थन",
+        "lang_btn": "🌐 भाषा बदलें",
+        "no_prod": "❌ वर्तमान में कोई उत्पाद उपलब्ध नहीं है।",
+        "wallet_title": "👛 <b>मेरा वॉलेट</b>\n\n💵 <b>Rs. बैलेंस:</b> ₹{rs:.2f}\n🪙 <b>कॉइन बैलेंस:</b> {coin} 🪙",
+        "choose_lang": "🌐 <b>अपनी भाषा चुनें:</b>",
+        "lang_changed": "✅ भाषा सफलतापूर्वक बदलकर <b>हिन्दी</b> कर दी गई है!",
+    },
+    "bn": {
+        "welcome": "👋 স্বাগতম <b>{name}</b>!\n\nনিচের মেনু থেকে আপনার পছন্দের অপশন বেছে নিন 👇",
+        "free_prod": "🆓 ফ্রি প্রোডাক্টস",
+        "paid_prod": "💎 পেইড প্রোডাক্টস",
+        "raffle": "🎟 র‍্যাফেল স্ট্যাটাস",
+        "pur_hist": "📜 পার্চেজ হিস্ট্রি",
+        "raf_hist": "📋 র‍্যাফেল হিস্ট্রি",
+        "wallet": "👛 ওয়ালেট",
+        "dev": "👨‍💻 ডেভেলপার",
+        "admin_login": "🔐 এডমিন লগইন",
+        "support": "🆘 হেল্প সাপোর্ট",
+        "lang_btn": "🌐 ভাষা পরিবর্তন",
+        "no_prod": "❌ বর্তমানে কোনো প্রোডাক্ট নেই।",
+        "wallet_title": "👛 <b>আমার ওয়ালেট</b>\n\n💵 <b>টাকা ব্যালেন্স:</b> ₹{rs:.2f}\n🪙 <b>কয়েন ব্যালেন্স:</b> {coin} 🪙",
+        "choose_lang": "🌐 <b>আপনার ভাষা নির্বাচন করুন:</b>",
+        "lang_changed": "✅ সফলভাবে ভাষা পরিবর্তন করে <b>বাংলা</b> করা হয়েছে!",
+    }
+}
+
+def get_txt(user_id, key):
+    user = get_user(user_id)
+    lang = user["language"] if user and "language" in user.keys() else "en"
+    return LANGS.get(lang, LANGS["en"]).get(key, LANGS["en"][key])
 
 # ==========================================
 # DATABASE SETUP
 # ==========================================
+fn_lang_added = False
+try:
+    c = conn.cursor()
+    c.execute("SELECT language FROM users LIMIT 1")
+    c.fetchone()
+    fn_lang_added = True
+except Exception:
+    pass
+
 def init_db():
     with db_lock:
         c = conn.cursor()
@@ -59,6 +127,7 @@ def init_db():
                 coin_balance INTEGER DEFAULT 0,
                 referred_by INTEGER DEFAULT NULL,
                 total_raffles INTEGER DEFAULT 0,
+                language TEXT DEFAULT 'en',
                 joined_at TEXT
             )
         """)
@@ -125,13 +194,17 @@ def init_db():
         """)
         conn.commit()
 
-
 init_db()
 
+if not fn_lang_added:
+    try:
+        with db_lock:
+            conn.execute("ALTER TABLE users ADD COLUMN language TEXT DEFAULT 'en'")
+            conn.commit()
+    except Exception:
+        pass
 
-# ==========================================
-# DB HELPERS
-# ==========================================
+
 def get_user(user_id):
     with db_lock:
         c = conn.cursor()
@@ -147,22 +220,27 @@ def register_or_update_user(tg_user, referrer_id=None):
     existing = get_user(user_id)
     now = ist_now()
     new_referral_credited = False
+    ref_old_coin = 0
+    ref_new_coin = 0
 
     with db_lock:
         c = conn.cursor()
         if existing is None:
             valid_ref = None
             if referrer_id and referrer_id != user_id:
-                c.execute("SELECT user_id FROM users WHERE user_id = ?", (referrer_id,))
-                if c.fetchone():
+                c.execute("SELECT user_id, coin_balance FROM users WHERE user_id = ?", (referrer_id,))
+                ref_row = c.fetchone()
+                if ref_row:
                     valid_ref = referrer_id
+                    ref_old_coin = ref_row["coin_balance"]
 
             c.execute("""
-                INSERT INTO users (user_id, username, full_name, rs_balance, coin_balance, referred_by, total_raffles, joined_at)
-                VALUES (?, ?, ?, 0.0, 0, ?, 0, ?)
+                INSERT INTO users (user_id, username, full_name, rs_balance, coin_balance, referred_by, total_raffles, language, joined_at)
+                VALUES (?, ?, ?, 0.0, 0, ?, 0, 'en', ?)
             """, (user_id, username, full_name, valid_ref, now))
 
             if valid_ref:
+                ref_new_coin = ref_old_coin + 1
                 c.execute("""
                     UPDATE users
                     SET coin_balance = coin_balance + 1,
@@ -185,10 +263,13 @@ def register_or_update_user(tg_user, referrer_id=None):
         try:
             bot.send_message(
                 referrer_id,
-                f"🎉 <b>New Raffle Join!</b>\n"
-                f"👤 Name: {html.escape(full_name)}\n"
-                f"🔗 Username: {html.escape(username)}\n"
-                f"🪙 You earned <b>+1 Coin</b>!"
+                f"🎉 <b>New Raffle / Referral Joined!</b>\n\n"
+                f"👤 <b>User Name:</b> {html.escape(full_name)}\n"
+                f"🔗 <b>Username:</b> {html.escape(username)}\n\n"
+                f"🪙 <b>Reward Earned:</b> +1 Coin\n"
+                f"📊 <b>Old Coin Balance:</b> {ref_old_coin} 🪙\n"
+                f"➕ <b>Added:</b> +1 🪙\n"
+                f"💰 <b>Total Coin Balance:</b> <b>{ref_new_coin} 🪙</b>"
             )
         except Exception:
             pass
@@ -223,26 +304,17 @@ def clear_state(user_id):
 
 
 # ==========================================
-# KEYBOARDS
+# KEYBOARDS (DYNAMIC LANGUAGE SUPPORTED)
 # ==========================================
-MAIN_BUTTONS = {
-    "Free products", "Paid products",
-    "Raffle status",
-    "Purchase history", "Raffle history",
-    "Wallet",
-    "Developer", "Admin login",
-    "Help support"
-}
-
-
-def main_menu_keyboard():
+def main_menu_keyboard(user_id):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    kb.row("Free products", "Paid products")
-    kb.row("Raffle status")
-    kb.row("Purchase history", "Raffle history")
-    kb.row("Wallet")
-    kb.row("Developer", "Admin login")
-    kb.row("Help support")
+    kb.row(get_txt(user_id, "free_prod"), get_txt(user_id, "paid_prod"))
+    kb.row(get_txt(user_id, "raffle"))
+    kb.row(get_txt(user_id, "pur_hist"), get_txt(user_id, "raf_hist"))
+    kb.row(get_txt(user_id, "wallet"))
+    kb.row(get_txt(user_id, "lang_btn"))
+    kb.row(get_txt(user_id, "dev"), get_txt(user_id, "admin_login"))
+    kb.row(get_txt(user_id, "support"))
     return kb
 
 
@@ -273,6 +345,7 @@ def admin_menu_keyboard():
 @bot.message_handler(commands=["start"])
 def handle_start(message):
     clear_state(message.from_user.id)
+    user_id = message.from_user.id
     referrer_id = None
     parts = message.text.split()
     if len(parts) > 1 and parts[1].startswith("ref_"):
@@ -284,12 +357,19 @@ def handle_start(message):
     register_or_update_user(message.from_user, referrer_id)
     name = html.escape(message.from_user.first_name or "User")
 
-    bot.send_message(
-        message.chat.id,
-        f"👋 স্বাগতম <b>{name}</b>!\n\n"
-        f"নিচের মেনু থেকে আপনার পছন্দের অপশন বেছে নিন 👇",
-        reply_markup=main_menu_keyboard()
-    )
+    if is_admin(user_id):
+        bot.send_message(
+            message.chat.id,
+            f"🔐 <b>Admin Panel</b>\nস্বাগতম অ্যাডমিন {name}!",
+            reply_markup=admin_menu_keyboard()
+        )
+    else:
+        welcome_text = get_txt(user_id, "welcome").format(name=name)
+        bot.send_message(
+            message.chat.id,
+            welcome_text,
+            reply_markup=main_menu_keyboard(user_id)
+        )
 
 
 def send_raffle_status(chat_id, user_id):
@@ -300,17 +380,16 @@ def send_raffle_status(chat_id, user_id):
     raffle_link = f"https://t.me/{bot_uname}?start=ref_{user_id}"
 
     text = (
-        f"🎟 <b>Raffle Status</b>\n\n"
+        f"🎟 <b>Raffle & Referral Dashboard</b>\n\n"
         f"👤 <b>Name:</b> {html.escape(user['full_name'])}\n"
         f"🔗 <b>Username:</b> {html.escape(user['username'])}\n"
-        f"👥 <b>Total Raffles:</b> {user['total_raffles']}\n"
-        f"🪙 <b>Total Coins:</b> {user['coin_balance']} 🪙\n"
-        f"💰 <b>Per Raffle:</b> 1 🪙\n\n"
-        f"🔗 <b>Your Raffle Link:</b>\n<code>{raffle_link}</code>\n\n"
-        f"<i>এই লিংক শেয়ার করুন! প্রতি নতুন জয়েনে ১ 🪙 কয়েন পাবেন।</i>"
+        f"👥 <b>Total Raffles / Joins:</b> <b>{user['total_raffles']}</b>\n"
+        f"🪙 <b>Total Coins Balance:</b> <b>{user['coin_balance']} 🪙</b>\n"
+        f"💰 <b>Earnings Per Referral:</b> +1 🪙\n\n"
+        f"🔗 <b>Your Exclusive Raffle Link:</b>\n<code>{raffle_link}</code>"
     )
     kb = types.InlineKeyboardMarkup()
-    kb.add(types.InlineKeyboardButton("📤 Share Link", url=f"https://t.me/share/url?url={raffle_link}&text=Join%20this%20bot!"))
+    kb.add(types.InlineKeyboardButton("📤 Share Link Now", url=f"https://t.me/share/url?url={raffle_link}&text=Join%20this%20amazing%20bot%20and%20get%20free%20rewards!"))
     bot.send_message(chat_id, text, reply_markup=kb)
 
 
@@ -318,11 +397,7 @@ def send_wallet(chat_id, user_id):
     user = get_user(user_id)
     if not user:
         return
-    text = (
-        f"👛 <b>My Wallet</b>\n\n"
-        f"💵 <b>Rs. Balance:</b> ₹{user['rs_balance']:.2f}\n"
-        f"🪙 <b>Coin Balance:</b> {user['coin_balance']} 🪙"
-    )
+    text = get_txt(user_id, "wallet_title").format(rs=user['rs_balance'], coin=user['coin_balance'])
     kb = types.InlineKeyboardMarkup()
     kb.row(
         types.InlineKeyboardButton("➕ Add Rs.", callback_data="wallet_add_rs"),
@@ -331,7 +406,7 @@ def send_wallet(chat_id, user_id):
     bot.send_message(chat_id, text, reply_markup=kb)
 
 
-def show_products_list(chat_id, ptype):
+def show_products_list(chat_id, ptype, user_id):
     with db_lock:
         c = conn.cursor()
         c.execute("SELECT id, name, price FROM products WHERE ptype = ? ORDER BY id DESC", (ptype,))
@@ -339,7 +414,7 @@ def show_products_list(chat_id, ptype):
 
     title = "🆓 <b>Free Products</b>" if ptype == "free" else "💎 <b>Paid Products</b>"
     if not rows:
-        bot.send_message(chat_id, f"{title}\n\n❌ বর্তমানে কোনো প্রোডাক্ট নেই।")
+        bot.send_message(chat_id, f"{title}\n\n{get_txt(user_id, 'no_prod')}")
         return
 
     kb = types.InlineKeyboardMarkup()
@@ -352,26 +427,27 @@ def show_products_list(chat_id, ptype):
 
 def deliver_product_file(chat_id, prod_name, file_type, file_value, file_name, tut_type, tut_value, tut_cb):
     kb = types.InlineKeyboardMarkup()
-    kb.add(types.InlineKeyboardButton("🎬 Tutorial Video", callback_data=tut_cb))
+    if tut_type != "none" and tut_value:
+        kb.add(types.InlineKeyboardButton("🎬 Tutorial Video", callback_data=tut_cb))
 
     caption = f"✅ <b>Product:</b> {html.escape(prod_name)}\n📁 <b>File Name:</b> {html.escape(file_name or prod_name)}"
     try:
         if file_type == "document" and file_value:
-            bot.send_document(chat_id, file_value, caption=caption, reply_markup=kb)
+            bot.send_document(chat_id, file_value, caption=caption, reply_markup=kb if tut_type != "none" else None)
         elif file_type == "video" and file_value:
-            bot.send_video(chat_id, file_value, caption=caption, reply_markup=kb)
+            bot.send_video(chat_id, file_value, caption=caption, reply_markup=kb if tut_type != "none" else None)
         elif file_type == "audio" and file_value:
-            bot.send_audio(chat_id, file_value, caption=caption, reply_markup=kb)
+            bot.send_audio(chat_id, file_value, caption=caption, reply_markup=kb if tut_type != "none" else None)
         elif file_type == "photo" and file_value:
-            bot.send_photo(chat_id, file_value, caption=caption, reply_markup=kb)
+            bot.send_photo(chat_id, file_value, caption=caption, reply_markup=kb if tut_type != "none" else None)
         else:
-            bot.send_message(chat_id, f"{caption}\n🔗 <b>Download/Access:</b> {html.escape(file_value or 'N/A')}", reply_markup=kb)
+            bot.send_message(chat_id, f"{caption}\n🔗 <b>Download/Access:</b> {html.escape(file_value or 'N/A')}", reply_markup=kb if tut_type != "none" else None)
     except Exception as e:
-        bot.send_message(chat_id, f"{caption}\n⚠️ ফাইল পাঠাতে সমস্যা হয়েছে: {html.escape(str(e))}", reply_markup=kb)
+        bot.send_message(chat_id, f"{caption}\n⚠️ ফাইল পাঠাতে সমস্যা হয়েছে: {html.escape(str(e))}")
 
 
 # ==========================================
-# MAIN TEXT HANDLER (MENU + STATES)
+# MAIN TEXT HANDLER
 # ==========================================
 @bot.message_handler(content_types=["text"])
 def handle_text(message):
@@ -379,28 +455,44 @@ def handle_text(message):
     text = message.text.strip()
     register_or_update_user(message.from_user)
 
-    # মেইন মেনুর বাটনে ক্লিক করলে আগের স্টেট ক্লিয়ার হবে
-    if text in MAIN_BUTTONS:
+    if text in [LANGS["en"]["lang_btn"], LANGS["hi"]["lang_btn"], LANGS["bn"]["lang_btn"]]:
+        clear_state(user_id)
+        kb = types.InlineKeyboardMarkup()
+        kb.row(
+            types.InlineKeyboardButton("🇬🇧 English", callback_data="lang_en"),
+            types.InlineKeyboardButton("🇮🇳 हिन्दी", callback_data="lang_hi"),
+            types.InlineKeyboardButton("🇧🇩 বাংলা", callback_data="lang_bn")
+        )
+        bot.send_message(message.chat.id, get_txt(user_id, "choose_lang"), reply_markup=kb)
+        return
+
+    is_free = text in [LANGS["en"]["free_prod"], LANGS["hi"]["free_prod"], LANGS["bn"]["free_prod"]]
+    is_paid = text in [LANGS["en"]["paid_prod"], LANGS["hi"]["paid_prod"], LANGS["bn"]["paid_prod"]]
+    is_raffle = text in [LANGS["en"]["raffle"], LANGS["hi"]["raffle"], LANGS["bn"]["raffle"]]
+    is_pur = text in [LANGS["en"]["pur_hist"], LANGS["hi"]["pur_hist"], LANGS["bn"]["pur_hist"]]
+    is_raf = text in [LANGS["en"]["raf_hist"], LANGS["hi"]["raf_hist"], LANGS["bn"]["raf_hist"]]
+    is_wal = text in [LANGS["en"]["wallet"], LANGS["hi"]["wallet"], LANGS["bn"]["wallet"]]
+    is_dev = text in [LANGS["en"]["dev"], LANGS["hi"]["dev"], LANGS["bn"]["dev"]]
+    is_sup = text in [LANGS["en"]["support"], LANGS["hi"]["support"], LANGS["bn"]["support"]]
+    is_adm = text in [LANGS["en"]["admin_login"], LANGS["hi"]["admin_login"], LANGS["bn"]["admin_login"]]
+
+    if is_free or is_paid or is_raffle or is_pur or is_raf or is_wal or is_dev or is_sup or is_adm:
         clear_state(user_id)
 
-        if text == "Free products":
-            show_products_list(message.chat.id, "free")
-
-        elif text == "Paid products":
-            show_products_list(message.chat.id, "paid")
-
-        elif text == "Raffle status":
+        if is_free:
+            show_products_list(message.chat.id, "free", user_id)
+        elif is_paid:
+            show_products_list(message.chat.id, "paid", user_id)
+        elif is_raffle:
             send_raffle_status(message.chat.id, user_id)
-
-        elif text == "Purchase history":
+        elif is_pur:
             kb = types.InlineKeyboardMarkup()
             kb.row(
                 types.InlineKeyboardButton("🆓 Free", callback_data="phist_free"),
                 types.InlineKeyboardButton("💎 Paid", callback_data="phist_paid")
             )
             bot.send_message(message.chat.id, "📜 <b>Purchase History</b>\n\nকোন ধরনের প্রোডাক্ট হিস্ট্রি দেখতে চান?", reply_markup=kb)
-
-        elif text == "Raffle history":
+        elif is_raf:
             with db_lock:
                 c = conn.cursor()
                 c.execute("""
@@ -414,7 +506,7 @@ def handle_text(message):
             if not rows:
                 bot.send_message(message.chat.id, "📋 <b>Raffle History</b>\n\nএখনো কেউ আপনার Raffle লিংক দিয়ে জয়েন করেনি।")
             else:
-                lines = ["📋 <b>Raffle History</b>\n"]
+                lines = ["📋 <b>Raffle & Referral History</b>\n"]
                 for idx, r in enumerate(rows[:30], 1):
                     lines.append(
                         f"{idx}. 👤 <b>{html.escape(r['referred_name'])}</b> "
@@ -424,26 +516,13 @@ def handle_text(message):
                 if len(rows) > 30:
                     lines.append(f"\n<i>...এবং আরও {len(rows) - 30} জন।</i>")
                 bot.send_message(message.chat.id, "\n".join(lines))
-
-        elif text == "Wallet":
+        elif is_wal:
             send_wallet(message.chat.id, user_id)
-
-        elif text == "Developer":
-            bot.send_message(
-                message.chat.id,
-                f"👨‍💻 <b>Developer Information</b>\n\n"
-                f"📩 Contact: {DEVELOPER_USERNAME}"
-            )
-
-        elif text == "Help support":
-            bot.send_message(
-                message.chat.id,
-                f"🆘 <b>Help & Support</b>\n\n"
-                f"যেকোনো সমস্যা বা সাহায্যের জন্য যোগাযোগ করুন:\n"
-                f"📩 {DEVELOPER_USERNAME}"
-            )
-
-        elif text == "Admin login":
+        elif is_dev:
+            bot.send_message(message.chat.id, f"👨‍💻 <b>Developer Information</b>\n\n📩 Contact: {DEVELOPER_USERNAME}")
+        elif is_sup:
+            bot.send_message(message.chat.id, f"🆘 <b>Help & Support</b>\n\nযেকোনো সমস্যা বা সাহায্যের জন্য যোগাযোগ করুন:\n📩 {DEVELOPER_USERNAME}")
+        elif is_adm:
             if is_admin(user_id):
                 bot.send_message(message.chat.id, "🔐 <b>Admin Panel</b>\nনিচের অপশনগুলো ব্যবহার করুন:", reply_markup=admin_menu_keyboard())
             else:
@@ -452,7 +531,7 @@ def handle_text(message):
         return
 
     # ==========================================
-    # USER / ADMIN STATE MACHINE
+    # STATE MACHINE
     # ==========================================
     st = user_states.get(user_id)
     if not st:
@@ -461,7 +540,6 @@ def handle_text(message):
     state = st["state"]
     data = st["data"]
 
-    # 1. Admin Login Password
     if state == "awaiting_admin_pass":
         clear_state(user_id)
         if text == ADMIN_PASSWORD:
@@ -470,7 +548,6 @@ def handle_text(message):
         else:
             bot.send_message(message.chat.id, "❌ ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।")
 
-    # 2. Wallet: Enter Amount
     elif state == "awaiting_add_rs_amount":
         try:
             amount = float(text)
@@ -483,7 +560,6 @@ def handle_text(message):
         clear_state(user_id)
         start_qr_payment_session(message.chat.id, user_id, amount)
 
-    # 3. Admin Add Product Steps
     elif state == "adm_prod_name":
         data["name"] = text
         st["state"] = "adm_prod_desc"
@@ -507,33 +583,21 @@ def handle_text(message):
             return
         data["price"] = price
         st["state"] = "adm_prod_image"
-        bot.send_message(message.chat.id, "🖼 প্রোডাক্টের <b>Image (Photo)</b> পাঠান (না চাইলে <code>skip</code> লিখুন):")
-
-    elif state == "adm_prod_image":
-        if text.lower() == "skip":
-            data["image_id"] = None
-            st["state"] = "adm_prod_file"
-            bot.send_message(message.chat.id, "📁 এখন প্রোডাক্টের <b>File</b> আপলোড করুন অথবা ডাউনলোড <b>Link</b> পাঠান:")
-        else:
-            bot.send_message(message.chat.id, "❌ একটি ছবি (Photo) পাঠান অথবা <code>skip</code> লিখুন:")
+        
+        kb = types.InlineKeyboardMarkup()
+        kb.add(types.InlineKeyboardButton("⏭ Skip Image", callback_data="skip_step_img"))
+        bot.send_message(message.chat.id, "🖼 প্রোডাক্টের <b>Image (Photo)</b> পাঠান অথবা স্কিপ করতে নিচের বাটনে ক্লিক করুন:", reply_markup=kb)
 
     elif state == "adm_prod_file":
         data["file_type"] = "link"
         data["file_value"] = text
         data["file_name"] = data["name"]
         st["state"] = "adm_prod_tutorial"
-        bot.send_message(message.chat.id, "🎬 এখন <b>Tutorial Video</b> আপলোড করুন অথবা ভিডিও লিংক দিন (না চাইলে <code>skip</code> লিখুন):")
+        
+        kb = types.InlineKeyboardMarkup()
+        kb.add(types.InlineKeyboardButton("⏭ Skip Tutorial", callback_data="skip_step_tut"))
+        bot.send_message(message.chat.id, "🎬 এখন <b>Tutorial Video</b> আপলোড করুন অথবা ভিডিও লিংক দিন (অথবা স্কিপ করুন):", reply_markup=kb)
 
-    elif state == "adm_prod_tutorial":
-        if text.lower() == "skip":
-            data["tutorial_type"] = "none"
-            data["tutorial_value"] = None
-        else:
-            data["tutorial_type"] = "link"
-            data["tutorial_value"] = text
-        save_new_product(message.chat.id, user_id, data)
-
-    # 4. Admin Edit Product Steps
     elif state == "adm_edit_name":
         pid = data["pid"]
         with db_lock:
@@ -575,15 +639,12 @@ def handle_text(message):
 
     elif state == "adm_edit_tut":
         pid = data["pid"]
-        t_type = "none" if text.lower() == "skip" else "link"
-        t_val = None if text.lower() == "skip" else text
         with db_lock:
-            conn.execute("UPDATE products SET tutorial_type = ?, tutorial_value = ? WHERE id = ?", (t_type, t_val, pid))
+            conn.execute("UPDATE products SET tutorial_type = 'link', tutorial_value = ? WHERE id = ?", (text, pid))
             conn.commit()
         clear_state(user_id)
         bot.send_message(message.chat.id, "✅ Tutorial আপডেট হয়েছে!", reply_markup=admin_menu_keyboard())
 
-    # 5. Admin Send Bonus
     elif state == "adm_bonus_target":
         target = text.strip()
         if target.upper() != "ALL":
@@ -643,7 +704,6 @@ def handle_text(message):
 
         bot.send_message(message.chat.id, f"✅ বোনাস পাঠানো সম্পন্ন! ({sent} জন ইউজারকে নোটিফিকেশন দেওয়া হয়েছে)", reply_markup=admin_menu_keyboard())
 
-    # 6. Admin Broadcast Notification
     elif state == "adm_broadcast":
         clear_state(user_id)
         with db_lock:
@@ -651,6 +711,7 @@ def handle_text(message):
             c.execute("SELECT user_id FROM users")
             uids = [r["user_id"] for r in c.fetchall()]
 
+        total_users = len(uids)
         sent, failed = 0, 0
         for uid in uids:
             try:
@@ -658,11 +719,19 @@ def handle_text(message):
                 sent += 1
             except Exception:
                 failed += 1
-        bot.send_message(message.chat.id, f"✅ নোটিফিকেশন পাঠানো শেষ!\n✔️ সফল: {sent}\n❌ ব্যর্থ: {failed}", reply_markup=admin_menu_keyboard())
+
+        report = (
+            f"📊 <b>Broadcast Report</b>\n\n"
+            f"👥 Total Users: <b>{total_users}</b>\n"
+            f"📤 Total Sent: <b>{total_users}</b>\n"
+            f"✔️ Success: <b>{sent}</b>\n"
+            f"❌ Error/Failed: <b>{failed}</b>"
+        )
+        bot.send_message(message.chat.id, report, reply_markup=admin_menu_keyboard())
 
 
 # ==========================================
-# PHOTO, DOCUMENT & VIDEO HANDLERS
+# MEDIA HANDLERS
 # ==========================================
 @bot.message_handler(content_types=["photo"])
 def handle_photo(message):
@@ -686,7 +755,10 @@ def handle_photo(message):
             data["file_value"] = file_id
             data["file_name"] = data["name"] + ".jpg"
             st["state"] = "adm_prod_tutorial"
-            bot.send_message(message.chat.id, "🎬 ফাইল সেভ হয়েছে! এখন <b>Tutorial Video</b> আপলোড করুন অথবা লিংক দিন (না চাইলে <code>skip</code> লিখুন):")
+            
+            kb = types.InlineKeyboardMarkup()
+            kb.add(types.InlineKeyboardButton("⏭ Skip Tutorial", callback_data="skip_step_tut"))
+            bot.send_message(message.chat.id, "🎬 ফাইল সেভ হয়েছে! এখন <b>Tutorial Video</b> আপলোড করুন অথবা লিংক দিন (অথবা স্কিপ করুন):", reply_markup=kb)
             return
 
         elif state == "adm_edit_file":
@@ -704,6 +776,8 @@ def handle_photo(message):
                 c = conn.cursor()
                 c.execute("SELECT user_id FROM users")
                 uids = [r["user_id"] for r in c.fetchall()]
+            
+            total_users = len(uids)
             sent, failed = 0, 0
             for uid in uids:
                 try:
@@ -711,10 +785,17 @@ def handle_photo(message):
                     sent += 1
                 except Exception:
                     failed += 1
-            bot.send_message(message.chat.id, f"✅ ফটো নোটিফিকেশন সম্পন্ন!\n✔️ সফল: {sent}\n❌ ব্যর্থ: {failed}", reply_markup=admin_menu_keyboard())
+
+            report = (
+                f"📊 <b>Broadcast Report (Photo)</b>\n\n"
+                f"👥 Total Users: <b>{total_users}</b>\n"
+                f"📤 Total Sent: <b>{total_users}</b>\n"
+                f"✔️ Success: <b>{sent}</b>\n"
+                f"❌ Error/Failed: <b>{failed}</b>"
+            )
+            bot.send_message(message.chat.id, report, reply_markup=admin_menu_keyboard())
             return
 
-    # Check active QR payment session (User uploading payment screenshot)
     qrs = qr_sessions.get(user_id)
     if qrs and qrs.get("active"):
         if time.time() > qrs["expires_at"]:
@@ -744,7 +825,6 @@ def handle_photo(message):
             f"⏳ আপনার রিকোয়েস্ট Admin-এর কাছে পাঠানো হয়েছে। অ্যাপ্রুভ হলে ব্যালেন্স যুক্ত হবে।"
         )
 
-        # Notify logged-in admins immediately
         kb = types.InlineKeyboardMarkup()
         kb.row(
             types.InlineKeyboardButton("✅ Approve", callback_data=f"pay_app_{req_id}"),
@@ -797,7 +877,10 @@ def handle_media_files(message):
         data["file_value"] = fval
         data["file_name"] = fname
         st["state"] = "adm_prod_tutorial"
-        bot.send_message(message.chat.id, "🎬 ফাইল সেভ হয়েছে! এখন <b>Tutorial Video</b> আপলোড করুন অথবা লিংক দিন (না চাইলে <code>skip</code> লিখুন):")
+        
+        kb = types.InlineKeyboardMarkup()
+        kb.add(types.InlineKeyboardButton("⏭ Skip Tutorial", callback_data="skip_step_tut"))
+        bot.send_message(message.chat.id, "🎬 ফাইল সেভ হয়েছে! এখন <b>Tutorial Video</b> আপলোড করুন অথবা লিংক দিন (অথবা স্কিপ করুন):", reply_markup=kb)
 
     elif state == "adm_prod_tutorial":
         data["tutorial_type"] = "video" if ftype == "video" else ftype
@@ -840,11 +923,30 @@ def save_new_product(chat_id, user_id, data):
             ist_now()
         ))
         conn.commit()
-    bot.send_message(chat_id, f"✅ প্রোডাক্ট <b>{html.escape(data['name'])}</b> সফলভাবে যুক্ত হয়েছে!", reply_markup=admin_menu_keyboard())
+        
+        c.execute("SELECT user_id FROM users")
+        all_uids = [r["user_id"] for r in c.fetchall()]
+
+    bot.send_message(chat_id, f"✅ প্রোডাক্ট <b>{html.escape(data['name'])}</b> সফলভাবে যুক্ত হয়েছে এবং ইউজারদের নোটিফিকেশন পাঠানো হচ্ছে!", reply_markup=admin_menu_keyboard())
+
+    def notify_new_prod():
+        prod_text = (
+            f"🔥 <b>New Product Added!</b>\n\n"
+            f"📦 <b>Name:</b> {html.escape(data['name'])}\n"
+            f"📝 <b>Desc:</b> {html.escape(data['description'] or '')}\n"
+            f"🏷 <b>Type:</b> {data['ptype'].upper()}"
+        )
+        for uid in all_uids:
+            try:
+                bot.send_message(uid, prod_text)
+            except Exception:
+                pass
+
+    threading.Thread(target=notify_new_prod, daemon=True).start()
 
 
 # ==========================================
-# QR CODE GENERATOR & 10-MIN EXPIRY TIMER
+# QR CODE & PAYMENT INSTRUCTION
 # ==========================================
 def start_qr_payment_session(chat_id, user_id, amount):
     upi_uri = f"upi://pay?pa={UPI_ID}&pn=TelegramStore&am={amount:.2f}&cu=INR"
@@ -854,26 +956,34 @@ def start_qr_payment_session(chat_id, user_id, amount):
     qr_img.save(bio, "PNG")
     bio.seek(0)
 
-    expires_at = time.time() + 600  # 10 minutes = 600 seconds
+    expires_at = time.time() + 600  # 10 minutes
+    
     caption = (
-        f"💳 <b>Add Money via UPI</b>\n\n"
+        f"💳 <b>Scan QR Code to Pay</b>\n\n"
         f"💵 <b>Amount:</b> ₹{amount:.2f}\n"
-        f"🆔 <b>UPI ID:</b> <code>{UPI_ID}</code>\n\n"
-        f"⏳ <b>Time Remaining:</b> 10:00 min\n"
-        f"📸 পেমেন্ট করে ১০ মিনিটের মধ্যে পেমেন্টের <b>স্ক্রিনশট (Image)</b> এখানে পাঠান।"
+        f"⏳ <b>Time Remaining:</b> 10:00 min"
     )
     msg = bot.send_photo(chat_id, bio, caption=caption)
+
+    instruction_text = (
+        f"📌 <b>Payment Instructions & UPI ID:</b>\n\n"
+        f"1️⃣ এই QR কোড স্ক্যান করে অথবা নিচে দেওয়া UPI ID তে টাকা পাঠান:\n"
+        f"🆔 UPI ID: <code>{UPI_ID}</code>\n"
+        f"💵 টাকার পরিমাণ: <b>₹{amount:.2f}</b>\n\n"
+        f"2️⃣ পেমেন্ট সফল হওয়ার পর পেমেন্টের <b>স্ক্রিনশট (Screenshot Image)</b> ঠিক এই চ্যাটে পাঠান।"
+    )
+    inst_msg = bot.send_message(chat_id, instruction_text)
 
     session = {
         "amount": amount,
         "expires_at": expires_at,
         "chat_id": chat_id,
         "msg_id": msg.message_id,
+        "inst_msg_id": inst_msg.message_id,
         "active": True
     }
     qr_sessions[user_id] = session
 
-    # Background countdown updater & expiry handler
     def timer_worker(uid, sess):
         for mins_left in [8, 5, 2, 1]:
             wait_sec = sess["expires_at"] - (mins_left * 60) - time.time()
@@ -886,11 +996,9 @@ def start_qr_payment_session(chat_id, user_id, amount):
                     chat_id=sess["chat_id"],
                     message_id=sess["msg_id"],
                     caption=(
-                        f"💳 <b>Add Money via UPI</b>\n\n"
+                        f"💳 <b>Scan QR Code to Pay</b>\n\n"
                         f"💵 <b>Amount:</b> ₹{sess['amount']:.2f}\n"
-                        f"🆔 <b>UPI ID:</b> <code>{UPI_ID}</code>\n\n"
-                        f"⏳ <b>Time Remaining:</b> ~{mins_left}:00 min\n"
-                        f"📸 পেমেন্ট করে পেমেন্টের <b>স্ক্রিনশট (Image)</b> এখানে পাঠান।"
+                        f"⏳ <b>Time Remaining:</b> ~{mins_left}:00 min"
                     )
                 )
             except Exception:
@@ -907,8 +1015,7 @@ def start_qr_payment_session(chat_id, user_id, amount):
                     message_id=sess["msg_id"],
                     caption=(
                         f"❌ <b>QR Code Expired!</b>\n\n"
-                        f"১০ মিনিট সময় শেষ হয়ে গেছে।\n"
-                        f"আবার টাকা অ্যাড করতে Wallet -> Add Rs. এ ক্লিক করুন।"
+                        f"১০ মিনিট সময় শেষ হয়ে গেছে। আবার টাকা অ্যাড করতে Wallet থেকে চেষ্টা করুন।"
                     )
                 )
             except Exception:
@@ -927,7 +1034,37 @@ def handle_callbacks(call):
     data = call.data
     bot.answer_callback_query(call.id)
 
-    # ---- PRODUCT VIEW (FREE & PAID) ----
+    if data.startswith("lang_"):
+        lang_code = data.split("_")[-1]
+        with db_lock:
+            conn.execute("UPDATE users SET language = ? WHERE user_id = ?", (lang_code, user_id))
+            conn.commit()
+        
+        bot.send_message(
+            chat_id,
+            get_txt(user_id, "lang_changed"),
+            reply_markup=main_menu_keyboard(user_id)
+        )
+        return
+
+    if data == "skip_step_img":
+        st = user_states.get(user_id)
+        if st and st["state"] == "adm_prod_image":
+            st["data"]["image_id"] = None
+            st["state"] = "adm_prod_file"
+            kb = types.InlineKeyboardMarkup()
+            kb.add(types.InlineKeyboardButton("⏭ Skip Tutorial", callback_data="skip_step_tut"))
+            bot.send_message(chat_id, "📁 ছবি স্কিপ করা হয়েছে! এখন প্রোডাক্টের <b>File</b> আপলোড করুন অথবা ডাউনলোড <b>Link</b> পাঠান:", reply_markup=kb)
+        return
+
+    if data == "skip_step_tut":
+        st = user_states.get(user_id)
+        if st and st["state"] == "adm_prod_tutorial":
+            st["data"]["tutorial_type"] = "none"
+            st["data"]["tutorial_value"] = None
+            save_new_product(chat_id, user_id, st["data"])
+        return
+
     if data.startswith("view_prod_"):
         pid = int(data.split("_")[-1])
         with db_lock:
@@ -965,7 +1102,6 @@ def handle_callbacks(call):
     elif data == "earn_coin_raffle":
         send_raffle_status(chat_id, user_id)
 
-    # ---- BUY PREVIEW ----
     elif data.startswith("buy_prod_"):
         pid = int(data.split("_")[-1])
         user = get_user(user_id)
@@ -1013,7 +1149,6 @@ def handle_callbacks(call):
 
         bot.send_message(chat_id, text, reply_markup=kb)
 
-    # ---- CONFIRM PURCHASE ----
     elif data.startswith("conf_buy_"):
         pid = int(data.split("_")[-1])
         with db_lock:
@@ -1056,7 +1191,6 @@ def handle_callbacks(call):
             prod["file_name"], prod["tutorial_type"], prod["tutorial_value"], f"tut_pur_{pur_id}"
         )
 
-    # ---- TUTORIAL VIDEO BUTTON ----
     elif data.startswith("tut_pur_"):
         pur_id = int(data.split("_")[-1])
         with db_lock:
@@ -1071,7 +1205,6 @@ def handle_callbacks(call):
         else:
             bot.send_message(chat_id, f"🎬 <b>Tutorial Video ({html.escape(row['product_name'])}):</b>\n{html.escape(row['tutorial_value'])}")
 
-    # ---- PURCHASE HISTORY ----
     elif data in ("phist_free", "phist_paid"):
         ptype = "free" if data == "phist_free" else "paid"
         with db_lock:
@@ -1106,17 +1239,13 @@ def handle_callbacks(call):
             row["file_name"], row["tutorial_type"], row["tutorial_value"], f"tut_pur_{pur_id}"
         )
 
-    # ---- WALLET CALLBACKS ----
     elif data == "wallet_add_rs":
         user_states[user_id] = {"state": "awaiting_add_rs_amount", "data": {}}
         bot.send_message(chat_id, "💵 আপনি কত টাকা (Rs.) অ্যাড করতে চান? পরিমাণ লিখুন (যেমন: 100):")
 
     elif data == "wallet_back":
-        bot.send_message(chat_id, "🏠 মেইন মেনু:", reply_markup=main_menu_keyboard())
+        bot.send_message(chat_id, "🏠 মেইন মেনু:", reply_markup=main_menu_keyboard(user_id))
 
-    # ==========================================
-    # ADMIN CALLBACKS
-    # ==========================================
     elif data.startswith("adm_") or data.startswith("pay_"):
         if not is_admin(user_id):
             bot.send_message(chat_id, "🔒 আপনি Admin নন! প্রথমে Admin Login করুন।")
@@ -1125,13 +1254,12 @@ def handle_callbacks(call):
         if data == "adm_logout":
             set_admin(user_id, False)
             clear_state(user_id)
-            bot.send_message(chat_id, "👋 Admin থেকে লগআউট সম্পন্ন হয়েছে।", reply_markup=main_menu_keyboard())
+            bot.send_message(chat_id, "👋 Admin থেকে লগআউট সম্পন্ন হয়েছে।", reply_markup=main_menu_keyboard(user_id))
 
         elif data == "adm_menu":
             clear_state(user_id)
             bot.send_message(chat_id, "🔐 <b>Admin Menu</b>", reply_markup=admin_menu_keyboard())
 
-        # ---- ADD PRODUCTS ----
         elif data == "adm_add_prod":
             kb = types.InlineKeyboardMarkup()
             kb.row(
@@ -1146,7 +1274,6 @@ def handle_callbacks(call):
             user_states[user_id] = {"state": "adm_prod_name", "data": {"ptype": ptype}}
             bot.send_message(chat_id, f"📦 নতুন <b>{ptype.upper()}</b> প্রোডাক্টের <b>নাম (Title)</b> লিখুন:")
 
-        # ---- MANAGEMENT PRODUCTS ----
         elif data == "adm_manage_prod":
             with db_lock:
                 c = conn.cursor()
@@ -1217,7 +1344,7 @@ def handle_callbacks(call):
         elif data.startswith("adm_et_"):
             pid = int(data.split("_")[-1])
             user_states[user_id] = {"state": "adm_edit_tut", "data": {"pid": pid}}
-            bot.send_message(chat_id, "🎬 নতুন Tutorial Video আপলোড করুন অথবা লিংক দিন (মুছতে চাইলে <code>skip</code>):")
+            bot.send_message(chat_id, "🎬 নতুন Tutorial Video আপলোড করুন অথবা লিংক দিন:")
 
         elif data.startswith("adm_del_"):
             pid = int(data.split("_")[-1])
@@ -1226,7 +1353,6 @@ def handle_callbacks(call):
                 conn.commit()
             bot.send_message(chat_id, "🗑 প্রোডাক্ট ডিলিট করা হয়েছে!", reply_markup=admin_menu_keyboard())
 
-        # ---- DASHBOARD ----
         elif data == "adm_dashboard":
             with db_lock:
                 c = conn.cursor()
@@ -1253,7 +1379,6 @@ def handle_callbacks(call):
                 reply_markup=admin_menu_keyboard()
             )
 
-        # ---- USERS LIST ----
         elif data.startswith("adm_users_"):
             offset = int(data.split("_")[-1])
             limit = 15
@@ -1279,7 +1404,6 @@ def handle_callbacks(call):
             kb.add(types.InlineKeyboardButton("🔙 Back", callback_data="adm_menu"))
             bot.send_message(chat_id, "\n".join(lines), reply_markup=kb)
 
-        # ---- ADD MONEY HISTORY ----
         elif data == "adm_money_hist":
             with db_lock:
                 c = conn.cursor()
@@ -1296,7 +1420,6 @@ def handle_callbacks(call):
                 )
             bot.send_message(chat_id, "\n".join(lines), reply_markup=admin_menu_keyboard())
 
-        # ---- SEND BONUS ----
         elif data == "adm_bonus":
             kb = types.InlineKeyboardMarkup()
             kb.row(
@@ -1311,12 +1434,10 @@ def handle_callbacks(call):
             user_states[user_id] = {"state": "adm_bonus_target", "data": {"btype": btype}}
             bot.send_message(chat_id, "👤 যাকে বোনাস দিতে চান তার <b>User ID</b> লিখুন (সবাইকে দিতে চাইলে <code>ALL</code> লিখুন):")
 
-        # ---- SEND NOTIFICATION ----
         elif data == "adm_notify":
             user_states[user_id] = {"state": "adm_broadcast", "data": {}}
             bot.send_message(chat_id, "📢 সব ইউজারকে পাঠানোর জন্য আপনার মেসেজ অথবা ক্যাপশনসহ ছবি পাঠান:")
 
-        # ---- RAFFLE LEADERBOARD ----
         elif data == "adm_leaderboard":
             with db_lock:
                 c = conn.cursor()
@@ -1337,7 +1458,6 @@ def handle_callbacks(call):
                 )
             bot.send_message(chat_id, "\n".join(lines), reply_markup=admin_menu_keyboard())
 
-        # ---- PAYMENT REQUESTS ----
         elif data == "adm_pay_reqs":
             with db_lock:
                 c = conn.cursor()
@@ -1414,7 +1534,7 @@ def handle_callbacks(call):
 
 
 # ==========================================
-# RENDER WEB SERVER KEEP-ALIVE (PORT BIND)
+# WEB SERVER KEEP-ALIVE
 # ==========================================
 class KeepAliveHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -1424,7 +1544,7 @@ class KeepAliveHandler(BaseHTTPRequestHandler):
         self.wfile.write(b"Telegram Bot is running!")
 
     def log_message(self, format, *args):
-        return  # অপ্রয়োজনীয় লগ বন্ধ রাখার জন্য
+        return
 
 
 def run_web_server():
@@ -1436,4 +1556,6 @@ def run_web_server():
 if __name__ == "__main__":
     threading.Thread(target=run_web_server, daemon=True).start()
     print("Bot is running...")
-    bot.infinity_polling(timeout=60, long_polling_timeout=60)
+    
+    # Conflict 409 error fix: remove_webhook=True clears old pending updates automatically
+    bot.infinity_polling(timeout=60, long_polling_timeout=60, remove_webhook=True)
